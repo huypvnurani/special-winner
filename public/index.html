@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <!-- Không zoom: maximum-scale + user-scalable=no (Android). iOS bỏ qua dòng này → nozoom.js lo phần còn lại -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>YuhTahnTax – Tính lương & thuế TNCN</title>
+  <meta name="description" content="Tính lương Gross/Net, thuế TNCN hằng tháng và quyết toán thuế năm" />
+
+  <!-- PWA ("Thêm vào màn hình chính"). ?v=__BUILD__ do deploy.sh thay để icon/manifest luôn mới -->
+  <link rel="manifest" href="manifest.json?v=__BUILD__" />
+  <meta name="theme-color" content="#0f766e" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png?v=__BUILD__" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=__BUILD__" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="YuhTahnTax" />
+
+  <!-- Chặn zoom càng sớm càng tốt (trước khi app tải) -->
+  <script src="nozoom.js?v=__BUILD__"></script>
+
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { DEFAULT: '#0f766e', fg: '#ffffff', soft: '#ccfbf1' } } } },
+    };
+  </script>
+  <link rel="stylesheet" href="base.css?v=__BUILD__" />
+  <style>
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:1rem; box-shadow:0 1px 2px rgb(0 0 0 / .05); }
+    .lbl { display:block; font-size:.8125rem; font-weight:500; color:#475569; margin-bottom:.25rem; }
+    .inp { width:100%; border:1px solid #cbd5e1; border-radius:.75rem; padding:.625rem .75rem; background:#fff; }
+    .inp:focus { outline:2px solid #0f766e33; border-color:#0f766e; }
+    .seg button { flex:1; padding:.5rem; border-radius:.625rem; font-weight:600; color:#475569; }
+    .seg button[aria-pressed="true"] { background:#fff; color:#0f766e; box-shadow:0 1px 2px rgb(0 0 0 / .1); }
+    .num { font-variant-numeric: tabular-nums; }
+    .tab[aria-selected="true"] { color:#0f766e; }
+    .tab[aria-selected="true"] .dot { background:#0f766e; }
+    table.rep td { padding:.4rem 0; vertical-align:top; }
+    table.rep tr + tr td { border-top:1px solid #f1f5f9; }
+    .mtbl { table-layout:fixed; }
+    .mtbl th:first-child { width:2rem; }
+    .mtbl th:nth-child(2) { width:35%; }
+    .mtbl td + td { padding-left:3px; }
+    .mtbl input { width:100%; min-width:0; border:1px solid #e2e8f0; border-radius:.5rem; padding:.375rem .3rem; text-align:right; }
+  </style>
+
+  <script type="module" src="app.js?v=__BUILD__"></script>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen">
+
+  <header class="sticky top-0 z-20 bg-brand text-brand-fg shadow safe-top">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+      <img src="icons/icon-192.png?v=__BUILD__" alt="" class="w-8 h-8 rounded-lg" />
+      <div class="flex-1 leading-tight">
+        <h1 class="text-lg font-semibold">YuhTahnTax</h1>
+        <p id="subtitle" class="text-xs opacity-80">Lương & thuế TNCN hằng tháng</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pt-4 pb-28 space-y-4">
+
+    <!-- ===== Tab 1: Lương tháng ===== -->
+    <section id="view-month" class="space-y-4">
+      <div class="card p-4 space-y-4">
+        <div class="seg flex gap-1 bg-slate-100 rounded-xl p-1" id="mMode">
+          <button data-v="g2n" aria-pressed="true">Gross → Net</button>
+          <button data-v="n2g" aria-pressed="false">Net → Gross</button>
+        </div>
+
+        <div>
+          <label class="lbl" id="mAmountLbl" for="mAmount">Lương Gross / tháng (VNĐ)</label>
+          <input id="mAmount" class="inp num text-lg font-semibold" inputmode="numeric" data-money placeholder="Ví dụ 30.000.000" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" for="mYm">Kỳ lương</label>
+            <input id="mYm" type="month" class="inp" min="2026-01" />
+          </div>
+          <div>
+            <label class="lbl" for="mRegion">Vùng lương tối thiểu</label>
+            <select id="mRegion" class="inp">
+              <option value="1">Vùng I</option><option value="2">Vùng II</option>
+              <option value="3">Vùng III</option><option value="4">Vùng IV</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <span class="lbl">Số người phụ thuộc</span>
+          <div class="flex items-center gap-3">
+            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="-1">−</button>
+            <input id="mDep" class="inp text-center w-20 num" inputmode="numeric" value="0" />
+            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="1">+</button>
+          </div>
+        </div>
+
+        <div>
+          <span class="lbl">Lương đóng bảo hiểm</span>
+          <div class="seg flex gap-1 bg-slate-100 rounded-xl p-1" id="mInsMode">
+            <button data-v="full" aria-pressed="true">Bằng lương Gross</button>
+            <button data-v="custom" aria-pressed="false">Mức khác</button>
+          </div>
+          <input id="mInsSalary" class="inp num mt-2 hidden" inputmode="numeric" data-money placeholder="Lương ghi trên hợp đồng đóng BH" />
+        </div>
+
+        <div>
+          <label class="lbl" for="mExempt">Thu nhập miễn thuế trong lương <span class="font-normal text-slate-400">(phụ cấp ăn ca, chênh lệch làm thêm giờ…)</span></label>
+          <input id="mExempt" class="inp num" inputmode="numeric" data-money placeholder="0" />
+        </div>
+      </div>
+
+      <div id="mResult" class="space-y-4"></div>
+    </section>
+
+    <!-- ===== Tab 2: Quyết toán năm ===== -->
+    <section id="view-year" class="space-y-4 hidden">
+      <div class="card p-4 space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" for="yYear">Năm quyết toán</label>
+            <select id="yYear" class="inp"><option>2026</option></select>
+          </div>
+          <div>
+            <label class="lbl" for="yRegion">Vùng</label>
+            <select id="yRegion" class="inp">
+              <option value="1">Vùng I</option><option value="2">Vùng II</option>
+              <option value="3">Vùng III</option><option value="4">Vùng IV</option>
+            </select>
+          </div>
+        </div>
+
+        <details class="rounded-xl bg-brand-soft/60 p-3" id="yQuick">
+          <summary class="font-semibold text-brand cursor-pointer">⚡ Điền nhanh 12 tháng</summary>
+          <p class="text-xs text-slate-500 mt-1">Nhập lương mỗi tháng như nhau, app tự tính BH và thuế tạm khấu trừ. Sau đó sửa từng tháng bên dưới nếu khác.</p>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div class="col-span-2"><label class="lbl" for="qGross">Lương Gross / tháng</label><input id="qGross" class="inp num" inputmode="numeric" data-money /></div>
+            <div><label class="lbl" for="qIns">Lương đóng BH <span class="font-normal text-slate-400">(trống = Gross)</span></label><input id="qIns" class="inp num" inputmode="numeric" data-money /></div>
+            <div><label class="lbl" for="qExempt">Miễn thuế / tháng</label><input id="qExempt" class="inp num" inputmode="numeric" data-money /></div>
+            <div><label class="lbl" for="qDep">Người phụ thuộc</label><input id="qDep" class="inp num" inputmode="numeric" value="0" /></div>
+            <div><label class="lbl" for="qBonus">Thưởng tháng 13 <span class="font-normal text-slate-400">(cộng vào T12)</span></label><input id="qBonus" class="inp num" inputmode="numeric" data-money /></div>
+          </div>
+          <button id="qFill" class="mt-3 w-full rounded-xl bg-brand text-brand-fg font-semibold py-3 active:opacity-80">Điền vào bảng 12 tháng</button>
+        </details>
+
+        <div>
+          <p class="lbl">Thu nhập từng tháng <span class="font-normal text-slate-400">(lấy theo phiếu lương / chứng từ khấu trừ)</span></p>
+          <div class="overflow-x-auto -mx-4 px-4">
+            <table class="mtbl text-sm w-full num">
+              <thead class="text-xs text-slate-500">
+                <tr><th class="text-left py-1">Th</th><th class="text-right px-1">TN chịu thuế</th><th class="text-right px-1">BH bắt buộc</th><th class="text-right pl-1">Thuế đã KT</th></tr>
+              </thead>
+              <tbody id="yRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-2">
+            <label class="lbl" for="yDepMonths">Tổng số tháng giảm trừ người phụ thuộc <span class="font-normal text-slate-400">(VD 2 người × 12 tháng = 24)</span></label>
+            <input id="yDepMonths" class="inp num" inputmode="numeric" value="0" />
+          </div>
+          <div><label class="lbl" for="yOtherInc">Thu nhập lương khác <span class="font-normal text-slate-400">(vãng lai…)</span></label><input id="yOtherInc" class="inp num" inputmode="numeric" data-money /></div>
+          <div><label class="lbl" for="yOtherTax">Thuế đã khấu trừ <span class="font-normal text-slate-400">(của khoản đó)</span></label><input id="yOtherTax" class="inp num" inputmode="numeric" data-money /></div>
+          <div><label class="lbl" for="yCharity">Từ thiện, khuyến học</label><input id="yCharity" class="inp num" inputmode="numeric" data-money /></div>
+          <div><label class="lbl" for="yPension">Hưu trí tự nguyện <span class="font-normal text-slate-400">(≤ 12tr)</span></label><input id="yPension" class="inp num" inputmode="numeric" data-money /></div>
+        </div>
+        <button id="yClear" class="w-full rounded-xl bg-slate-100 text-slate-600 font-semibold py-3 active:bg-slate-200">Xoá dữ liệu năm này</button>
+      </div>
+
+      <div id="yResult" class="space-y-4"></div>
+    </section>
+
+    <!-- ===== Tab 3: Biểu thuế & tham số ===== -->
+    <section id="view-info" class="space-y-4 hidden"></section>
+
+    <p class="text-center text-xs text-slate-400 px-4">Kết quả chỉ mang tính tham khảo. Hãy đối chiếu với chứng từ khấu trừ thuế và cơ quan thuế khi quyết toán.</p>
+  </main>
+
+  <!-- Thanh tab dưới -->
+  <nav class="fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom" role="tablist">
+    <div class="max-w-3xl mx-auto grid grid-cols-3 text-xs font-semibold text-slate-500">
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="month" aria-selected="true"><span class="text-xl">💰</span>Lương tháng<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="year" aria-selected="false"><span class="text-xl">🧾</span>Quyết toán năm<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="info" aria-selected="false"><span class="text-xl">📋</span>Biểu thuế<span class="dot w-1 h-1 rounded-full"></span></button>
+    </div>
+  </nav>
+
+  <noscript><p style="padding:24px">Cần bật JavaScript để dùng YuhTahnTax.</p></noscript>
+</body>
+</html>

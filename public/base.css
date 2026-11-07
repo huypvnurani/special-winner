@@ -1,0 +1,26 @@
+/* Nền chung cho mọi Yuh app: cảm giác như app native trên điện thoại. */
+
+/* Không zoom khi chạm đúp, không tự phóng chữ khi xoay ngang */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Tắt kéo-để-tải-lại / nảy cuộn của trình duyệt */
+html, body { overscroll-behavior: none; }
+
+/* Không bôi chọn chữ / menu nhấn giữ ở nhãn, nút; ô nhập vẫn chọn bình thường */
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, select, [contenteditable], pre, code, .selectable {
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+}
+
+/* iOS tự zoom khi focus ô có chữ < 16px */
+input, textarea, select { font-size: 16px !important; }
+
+/* Tai thỏ / thanh home (cần viewport-fit=cover) */
+.safe-top { padding-top: max(env(safe-area-inset-top), 0.5rem); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0.75rem); }
+
+/* Vùng tự xử lý cử chỉ (canvas, kéo thả, bản đồ…) thì thêm class này */
+.touch-none-all { touch-action: none; }
+
+[x-cloak] { display: none !important; }

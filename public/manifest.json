@@ -1,0 +1,18 @@
+{
+  "name": "YuhTahnTax – Tính lương & thuế TNCN",
+  "short_name": "YuhTahnTax",
+  "description": "Tính lương Gross/Net, thuế TNCN hằng tháng và quyết toán thuế năm",
+  "lang": "vi",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "icons/icon-192.png?v=__BUILD__", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png?v=__BUILD__", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png?v=__BUILD__", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
