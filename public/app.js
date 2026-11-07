@@ -57,13 +57,6 @@ function renderReport(r) {
   return hl + secs + tables;
 }
 
-// Nút xuất file dưới kết quả
-const exportBar = (kind) => `
-  <div class="grid grid-cols-2 gap-3">
-    <button data-export="pdf" data-kind="${kind}" class="rounded-xl bg-brand text-brand-fg font-semibold py-3 active:opacity-80"><i class="fa-solid fa-file-pdf mr-1" aria-hidden="true"></i> Xuất PDF</button>
-    <button data-export="xlsx" data-kind="${kind}" class="rounded-xl bg-white border border-brand text-brand font-semibold py-3 active:bg-brand-soft"><i class="fa-solid fa-file-excel mr-1" aria-hidden="true"></i> Xuất Excel</button>
-  </div>`;
-
 const bracketRows = (tax) => tax.rows.map((b) => [
   `${pct(b.rate)}: ${b.to === Infinity ? `trên ${fmt(b.from)}` : `${fmt(b.from)} – ${fmt(b.to)}`}`,
   fmt(b.tax), { indent: true, muted: !b.part },
@@ -183,7 +176,7 @@ function renderMonth(sync = false) {
     : 'Net → Gross: nhập số tiền muốn nhận về tay để biết cần thoả thuận lương Gross bao nhiêu.';
   $('mInsSalary').classList.toggle('hidden', m.insMode !== 'custom');
   document.querySelectorAll('#view-month [data-ld]').forEach((el) => el.classList.toggle('hidden', m.contract === 'short'));
-  $('mResult').innerHTML = m.amount ? renderReport(monthReport()) + exportBar('month')
+  $('mResult').innerHTML = m.amount ? renderReport(monthReport())
     : '<div class="card p-5 text-center text-slate-500">Nhập mức lương để xem kết quả</div>';
   const [y, mo] = (m.ym || nowYm).split('-');
   $('mSyncInfo').textContent = !m.syncYear ? 'Đang tắt: chỉ tính thử, không ghi vào quyết toán.'
@@ -313,8 +306,7 @@ export function yearReport() {
 }
 
 function renderYear() {
-  const has = yd.months.some((x) => x.taxable) || yd.sources.some((s) => s.income);
-  $('yResult').innerHTML = has ? renderReport(yearReport()) + exportBar('year')
+  $('yResult').innerHTML = hasYearData() ? renderReport(yearReport())
     : '<div class="card p-5 text-center text-slate-500">Nhập thu nhập các tháng (hoặc dùng “Điền nhanh”) để xem kết quả quyết toán</div>';
 }
 
@@ -391,32 +383,50 @@ function renderInfo() {
   $('view-info').innerHTML = renderReport({ sections });
 }
 
-// ================= Xuất PDF / Excel =================
-document.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-export]');
-  if (!b || b.disabled) return;
-  const isYear = b.dataset.kind === 'year';
+// ================= Xuất PDF / Excel (nút trên thanh tiêu đề, theo tab đang mở) =================
+let curTab = 'month', exporting = false;
+const hasYearData = () => yd.months.some((x) => x.taxable) || yd.sources.some((s) => s.income);
+async function exportCurrent(kind) {
+  if (exporting) return;
+  const isYear = curTab === 'year';
+  if (curTab === 'info') return;
+  if (isYear ? !hasYearData() : !m.amount) { alert('Chưa có số liệu để xuất. Hãy nhập số liệu trước.'); return; }
   const report = isYear ? yearReport() : monthReport();
   const name = isYear ? `YuhTahnTax_QuyetToan_${yearSel}` : `YuhTahnTax_Luong_${m.ym || nowYm}`;
-  const label = b.innerHTML;
-  b.disabled = true; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1" aria-hidden="true"></i> Đang tạo file…';
+  const btns = document.querySelectorAll(`[data-action="${kind}"]`);
+  const labels = [...btns].map((b) => b.innerHTML);
+  exporting = true;
+  btns.forEach((b) => { b.disabled = true; b.querySelector('i').className = 'fa-solid fa-spinner fa-spin'; });
   try {
-    if (b.dataset.export === 'pdf') await exportPDF(report, name + '.pdf');
+    if (kind === 'pdf') await exportPDF(report, name + '.pdf');
     else await exportXLSX(report, name + '.xlsx');
   } catch (err) {
     console.error(err);
     alert('Không xuất được file: ' + err.message);
   } finally {
-    b.disabled = false; b.innerHTML = label;
+    exporting = false;
+    btns.forEach((b, i) => { b.disabled = false; b.innerHTML = labels[i]; });
+    setExportDlg(false);
   }
-});
+}
+
+// Hộp thoại chọn PDF / Excel
+function setExportDlg(open) {
+  if (open) {
+    if (curTab === 'info') return;
+    if (curTab === 'year' ? !hasYearData() : !m.amount) { alert('Chưa có số liệu để xuất. Hãy nhập số liệu trước.'); return; }
+    $('exportSub').textContent = (curTab === 'year' ? yearReport() : monthReport()).title;
+  }
+  $('exportDlg').classList.toggle('hidden', !open);
+}
+$('exportDlg').addEventListener('click', (e) => { if (e.target.closest('[data-close]') && !exporting) setExportDlg(false); });
 
 // ================= Sao lưu / mở file .yuhtax =================
 async function saveData() {
   const day = new Date().toLocaleDateString('sv');   // YYYY-MM-DD
   await saveBlob(new Blob([exportAll()], { type: 'application/octet-stream' }), `YuhTahnTax_DuLieu_${day}.yuhtax`);
 }
-const ACTIONS = { save: saveData, open: () => $('fileOpen').click() };
+const ACTIONS = { save: saveData, open: () => $('fileOpen').click(), pdf: () => exportCurrent('pdf'), xlsx: () => exportCurrent('xlsx'), export: () => setExportDlg(true) };
 
 // Menu ☰ (điện thoại)
 const setMenu = (open) => { $('menu').classList.toggle('hidden', !open); $('btnMenu').setAttribute('aria-expanded', String(open)); };
@@ -426,7 +436,7 @@ document.addEventListener('click', (e) => {
   if (a) { setMenu(false); ACTIONS[a.dataset.action]?.(); return; }
   if (!e.target.closest('#menu')) setMenu(false);
 });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setMenu(false); if (!exporting) setExportDlg(false); } });
 $('fileOpen').onchange = async (e) => {
   const file = e.target.files[0];
   e.target.value = '';
@@ -448,6 +458,9 @@ function showTab(t) {
   document.querySelectorAll('.tab').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
   for (const k of ['month', 'year', 'info']) $('view-' + k).classList.toggle('hidden', k !== t);
   $('subtitle').textContent = SUB[t];
+  curTab = t;
+  // Tab Biểu thuế không có gì để xuất → ẩn nút xuất
+  document.querySelectorAll('[data-export-ui]').forEach((el) => el.classList.toggle('hidden', t === 'info'));
   store.set('tab', t);
   scrollTo(0, 0);
 }

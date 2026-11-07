@@ -86,6 +86,8 @@
       </div>
       <!-- Sao lưu dữ liệu ra file .yuhtax / mở lại. Máy tính: nút trên thanh; điện thoại: menu ☰ -->
       <div class="hidden sm:flex items-center gap-2 shrink-0">
+        <button data-action="export" data-export-ui title="Xuất kết quả tab đang mở ra PDF hoặc Excel" class="rounded-lg bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-white/25 active:bg-white/30"><i class="fa-solid fa-file-export mr-1" aria-hidden="true"></i> Xuất file</button>
+        <span data-export-ui class="w-px h-6 bg-white/30 mx-1" aria-hidden="true"></span>
         <button data-action="save" title="Lưu toàn bộ dữ liệu ra file .yuhtax" class="rounded-lg bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-white/25 active:bg-white/30"><i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i> Lưu file</button>
         <button data-action="open" title="Mở file .yuhtax đã lưu" class="rounded-lg bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-white/25 active:bg-white/30"><i class="fa-solid fa-folder-open mr-1" aria-hidden="true"></i> Mở file</button>
       </div>
@@ -94,7 +96,8 @@
           <i class="fa-solid fa-bars text-xl" aria-hidden="true"></i>
         </button>
         <div id="menu" class="hidden absolute right-0 top-11 w-60 rounded-xl bg-white text-slate-800 shadow-xl border border-slate-200 py-1 overflow-hidden">
-          <button data-action="save" class="w-full text-left px-4 py-3 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-floppy-disk w-5 text-brand" aria-hidden="true"></i> Lưu file dữ liệu</span><br><span class="text-xs text-slate-500 pl-6">Xuất toàn bộ ra file .yuhtax</span></button>
+          <button data-action="export" data-export-ui class="w-full text-left px-4 py-3 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-file-export w-5 text-brand" aria-hidden="true"></i> Xuất file</span><br><span class="text-xs text-slate-500 pl-6">PDF hoặc Excel của tab này</span></button>
+          <button data-action="save" class="w-full text-left px-4 py-3 border-t-4 border-slate-100 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-floppy-disk w-5 text-brand" aria-hidden="true"></i> Lưu file dữ liệu</span><br><span class="text-xs text-slate-500 pl-6">Xuất toàn bộ ra file .yuhtax</span></button>
           <button data-action="open" class="w-full text-left px-4 py-3 border-t border-slate-100 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-folder-open w-5 text-brand" aria-hidden="true"></i> Mở file dữ liệu</span><br><span class="text-xs text-slate-500 pl-6">Nạp lại từ file .yuhtax đã lưu</span></button>
         </div>
       </div>
@@ -264,6 +267,30 @@
       <button class="tab py-1.5 flex flex-col items-center gap-0.5" data-tab="info" aria-selected="false"><span class="text-base leading-none"><i class="fa-solid fa-table-list" aria-hidden="true"></i></span>Biểu thuế</button>
     </div>
   </nav>
+
+  <!-- Hộp thoại chọn loại file xuất -->
+  <div id="exportDlg" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <div data-close class="absolute inset-0 bg-slate-900/40"></div>
+    <div class="relative w-full sm:max-w-sm bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-5 safe-bottom">
+      <div class="flex items-start gap-3">
+        <div class="flex-1">
+          <h2 id="exportTitle" class="text-lg font-semibold">Xuất file</h2>
+          <p id="exportSub" class="text-sm text-slate-500"></p>
+        </div>
+        <button data-close class="w-9 h-9 -mr-2 -mt-1 rounded-lg text-slate-500 hover:bg-slate-100 active:bg-slate-200" aria-label="Đóng"><i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i></button>
+      </div>
+      <div class="mt-4 space-y-3">
+        <button data-action="pdf" class="w-full flex items-center gap-4 rounded-xl border border-slate-200 p-4 text-left hover:border-brand hover:bg-brand-soft/40 active:bg-brand-soft disabled:opacity-60">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-brand-soft text-brand text-xl flex items-center justify-center"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i></span>
+          <span><b>PDF</b><br><span class="text-xs text-slate-500">Để in hoặc gửi, đối chiếu với phiếu lương</span></span>
+        </button>
+        <button data-action="xlsx" class="w-full flex items-center gap-4 rounded-xl border border-slate-200 p-4 text-left hover:border-brand hover:bg-brand-soft/40 active:bg-brand-soft disabled:opacity-60">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-emerald-50 text-emerald-700 text-xl flex items-center justify-center"><i class="fa-solid fa-file-excel" aria-hidden="true"></i></span>
+          <span><b>Excel (.xlsx)</b><br><span class="text-xs text-slate-500">Bảng tính, sửa và tính tiếp được</span></span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <noscript><p style="padding:24px">Cần bật JavaScript để dùng YuhTahnTax.</p></noscript>
 </body>
