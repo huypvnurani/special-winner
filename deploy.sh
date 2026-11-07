@@ -23,6 +23,9 @@ firebase login:list 2>/dev/null | grep -q "$FIREBASE_ACCOUNT" \
 
 FB="firebase --account $FIREBASE_ACCOUNT --project $PROJECT_ID --non-interactive"
 
+# 0. File .yuhtax cũ của người dùng phải còn mở được (xem FORMAT.md)
+node tools/check-yuhtax.mjs || die "File mẫu .yuhtax không mở được — sửa datafile.js trước khi deploy"
+
 # 1. Build vào dist/: đóng dấu version cho service worker + ?v= của icon/manifest/js để client nhận bản mới
 BUILD="$(date +%Y%m%d%H%M%S)"
 rm -rf dist && cp -R public dist

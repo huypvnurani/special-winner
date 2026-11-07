@@ -1,0 +1,31 @@
+{
+  "app": "YuhTahnTax",
+  "_comment": "Dữ liệu kiểu bản app đầu tiên (11/2026): chưa có số format, chưa có nguồn thu nhập khác (chỉ otherInc/otherTax), tháng chưa có dep. Không được sửa file này.",
+  "data": {
+    "month": { "mode": "g2n", "amount": 30000000, "ym": "2026-11", "region": 1, "dep": 0, "insMode": "full", "insSalary": 0, "exempt": 0 },
+    "tab": "year",
+    "yearSel": 2026,
+    "year:2026": {
+      "region": 1,
+      "months": [
+        { "taxable": 30000000, "ins": 3150000, "withheld": 635000 },
+        { "taxable": 30000000, "ins": 3150000, "withheld": 635000 },
+        { "taxable": "30.000.000", "ins": 3150000, "withheld": 635000 }
+      ],
+      "depMonths": 12,
+      "otherInc": 50000000,
+      "otherTax": 5000000,
+      "charity": 0,
+      "pension": 0
+    }
+  },
+  "_expect": {
+    "month.contract": "ld",
+    "month.syncYear": true,
+    "year:2026.months.2.taxable": 30000000,
+    "year:2026.months.11.taxable": 0,
+    "year:2026.sources.0.income": 50000000,
+    "year:2026.sources.0.withheld": 5000000,
+    "year:2026.depMonths": 12
+  }
+}

@@ -27,6 +27,8 @@
       theme: { extend: { colors: { brand: { DEFAULT: '#0f766e', fg: '#ffffff', soft: '#ccfbf1' } } } },
     };
   </script>
+  <!-- Icon: Font Awesome 6 (ghim version, cdnjs) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="base.css?v=__BUILD__" />
   <style>
     .card { background:#fff; border:1px solid #e2e8f0; border-radius:1rem; box-shadow:0 1px 2px rgb(0 0 0 / .05); }
@@ -54,10 +56,25 @@
   <header class="sticky top-0 z-20 bg-brand text-brand-fg shadow safe-top">
     <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
       <img src="icons/icon-192.png?v=__BUILD__" alt="" class="w-8 h-8 rounded-lg" />
-      <div class="flex-1 leading-tight">
+      <div class="flex-1 min-w-0 leading-tight">
         <h1 class="text-lg font-semibold">YuhTahnTax</h1>
-        <p id="subtitle" class="text-xs opacity-80">Lương & thuế TNCN hằng tháng</p>
+        <p id="subtitle" class="text-xs opacity-80 truncate">Lương & thuế TNCN hằng tháng</p>
       </div>
+      <!-- Sao lưu dữ liệu ra file .yuhtax / mở lại. Máy tính: nút trên thanh; điện thoại: menu ☰ -->
+      <div class="hidden sm:flex items-center gap-2 shrink-0">
+        <button data-action="save" title="Lưu toàn bộ dữ liệu ra file .yuhtax" class="rounded-lg bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-white/25 active:bg-white/30"><i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i> Lưu file</button>
+        <button data-action="open" title="Mở file .yuhtax đã lưu" class="rounded-lg bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-white/25 active:bg-white/30"><i class="fa-solid fa-folder-open mr-1" aria-hidden="true"></i> Mở file</button>
+      </div>
+      <div class="relative sm:hidden">
+        <button id="btnMenu" aria-label="Menu" aria-expanded="false" aria-controls="menu" class="w-10 h-10 -mr-2 rounded-lg flex items-center justify-center active:bg-white/20">
+          <i class="fa-solid fa-bars text-xl" aria-hidden="true"></i>
+        </button>
+        <div id="menu" class="hidden absolute right-0 top-11 w-60 rounded-xl bg-white text-slate-800 shadow-xl border border-slate-200 py-1 overflow-hidden">
+          <button data-action="save" class="w-full text-left px-4 py-3 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-floppy-disk w-5 text-brand" aria-hidden="true"></i> Lưu file dữ liệu</span><br><span class="text-xs text-slate-500 pl-6">Xuất toàn bộ ra file .yuhtax</span></button>
+          <button data-action="open" class="w-full text-left px-4 py-3 border-t border-slate-100 active:bg-slate-100"><span class="font-semibold"><i class="fa-solid fa-folder-open w-5 text-brand" aria-hidden="true"></i> Mở file dữ liệu</span><br><span class="text-xs text-slate-500 pl-6">Nạp lại từ file .yuhtax đã lưu</span></button>
+        </div>
+      </div>
+      <input id="fileOpen" type="file" class="hidden" />
     </div>
   </header>
 
@@ -91,27 +108,52 @@
         </div>
 
         <div>
+          <label class="lbl" for="mContract">Loại hợp đồng</label>
+          <select id="mContract" class="inp">
+            <option value="ld">HĐLĐ từ 3 tháng trở lên</option>
+            <option value="short">Thử việc riêng / CTV / HĐ dưới 3 tháng (khấu trừ 10%)</option>
+          </select>
+        </div>
+
+        <div data-ld>
           <span class="lbl">Số người phụ thuộc</span>
           <div class="flex items-center gap-3">
-            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="-1">−</button>
+            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="-1" aria-label="Bớt"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
             <input id="mDep" class="inp text-center w-20 num" inputmode="numeric" value="0" />
-            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="1">+</button>
+            <button class="w-11 h-11 rounded-xl bg-slate-100 text-xl font-bold active:bg-slate-200" data-step="mDep" data-d="1" aria-label="Thêm"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
           </div>
         </div>
 
-        <div>
+        <div data-ld>
           <span class="lbl">Lương đóng bảo hiểm</span>
           <div class="seg flex gap-1 bg-slate-100 rounded-xl p-1" id="mInsMode">
-            <button data-v="full" aria-pressed="true">Bằng lương Gross</button>
+            <button data-v="full" aria-pressed="true">Bằng Gross</button>
             <button data-v="custom" aria-pressed="false">Mức khác</button>
           </div>
           <input id="mInsSalary" class="inp num mt-2 hidden" inputmode="numeric" data-money placeholder="Lương ghi trên hợp đồng đóng BH" />
         </div>
 
-        <div>
-          <label class="lbl" for="mExempt">Thu nhập miễn thuế trong lương <span class="font-normal text-slate-400">(phụ cấp ăn ca, chênh lệch làm thêm giờ…)</span></label>
-          <input id="mExempt" class="inp num" inputmode="numeric" data-money placeholder="0" />
+        <label class="flex items-start gap-3 rounded-xl bg-brand-soft/60 p-3">
+          <input id="mSync" type="checkbox" class="mt-0.5 w-5 h-5 shrink-0" style="accent-color:#0f766e" />
+          <span class="text-sm leading-snug"><b>Tự ghi vào quyết toán năm</b><br /><span id="mSyncInfo" class="text-xs text-slate-500"></span></span>
+        </label>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" for="mMeal">Phụ cấp ăn trưa <span class="font-normal text-slate-400">(miễn thuế ≤ 730k)</span></label>
+            <input id="mMeal" class="inp num" inputmode="numeric" data-money placeholder="0" />
+          </div>
+          <div>
+            <label class="lbl" for="mExempt">Miễn thuế khác <span class="font-normal text-slate-400">(làm thêm giờ…)</span></label>
+            <input id="mExempt" class="inp num" inputmode="numeric" data-money placeholder="0" />
+          </div>
         </div>
+        <p class="text-xs text-slate-400 -mt-2">Lương Gross ở trên là tổng thu nhập, đã gồm phụ cấp ăn trưa.</p>
+
+        <label class="flex items-center gap-3" data-ld>
+          <input id="mUnion" type="checkbox" class="w-5 h-5 shrink-0" style="accent-color:#0f766e" />
+          <span class="text-sm">Là đoàn viên công đoàn <span class="text-slate-400">(đóng 0,5%)</span></span>
+        </label>
       </div>
 
       <div id="mResult" class="space-y-4"></div>
@@ -135,7 +177,7 @@
         </div>
 
         <details class="rounded-xl bg-brand-soft/60 p-3" id="yQuick">
-          <summary class="font-semibold text-brand cursor-pointer">⚡ Điền nhanh 12 tháng</summary>
+          <summary class="font-semibold text-brand cursor-pointer"><i class="fa-solid fa-bolt mr-1" aria-hidden="true"></i> Điền nhanh 12 tháng</summary>
           <p class="text-xs text-slate-500 mt-1">Nhập lương mỗi tháng như nhau, app tự tính BH và thuế tạm khấu trừ. Sau đó sửa từng tháng bên dưới nếu khác.</p>
           <div class="grid grid-cols-2 gap-3 mt-3">
             <div class="col-span-2"><label class="lbl" for="qGross">Lương Gross / tháng</label><input id="qGross" class="inp num" inputmode="numeric" data-money /></div>
@@ -148,7 +190,7 @@
         </details>
 
         <div>
-          <p class="lbl">Thu nhập từng tháng <span class="font-normal text-slate-400">(lấy theo phiếu lương / chứng từ khấu trừ)</span></p>
+          <p class="lbl">Nguồn chính – thu nhập từng tháng <span class="font-normal text-slate-400">(theo phiếu lương / chứng từ khấu trừ)</span></p>
           <div class="overflow-x-auto -mx-4 px-4">
             <table class="mtbl text-sm w-full num">
               <thead class="text-xs text-slate-500">
@@ -159,13 +201,18 @@
           </div>
         </div>
 
+        <div>
+          <p class="lbl">Nguồn thu nhập khác <span class="font-normal text-slate-400">(công ty thứ 2, hợp đồng vãng lai, cộng tác viên…)</span></p>
+          <div id="ySources" class="space-y-3"></div>
+          <button id="yAddSource" class="mt-2 w-full rounded-xl border border-dashed border-brand text-brand font-semibold py-2.5 active:bg-brand-soft"><i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> Thêm nguồn thu nhập</button>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div class="col-span-2">
             <label class="lbl" for="yDepMonths">Tổng số tháng giảm trừ người phụ thuộc <span class="font-normal text-slate-400">(VD 2 người × 12 tháng = 24)</span></label>
+            <p id="yDepHint" class="text-xs text-slate-400 -mt-0.5 mb-1"></p>
             <input id="yDepMonths" class="inp num" inputmode="numeric" value="0" />
           </div>
-          <div><label class="lbl" for="yOtherInc">Thu nhập lương khác <span class="font-normal text-slate-400">(vãng lai…)</span></label><input id="yOtherInc" class="inp num" inputmode="numeric" data-money /></div>
-          <div><label class="lbl" for="yOtherTax">Thuế đã khấu trừ <span class="font-normal text-slate-400">(của khoản đó)</span></label><input id="yOtherTax" class="inp num" inputmode="numeric" data-money /></div>
           <div><label class="lbl" for="yCharity">Từ thiện, khuyến học</label><input id="yCharity" class="inp num" inputmode="numeric" data-money /></div>
           <div><label class="lbl" for="yPension">Hưu trí tự nguyện <span class="font-normal text-slate-400">(≤ 12tr)</span></label><input id="yPension" class="inp num" inputmode="numeric" data-money /></div>
         </div>
@@ -178,15 +225,18 @@
     <!-- ===== Tab 3: Biểu thuế & tham số ===== -->
     <section id="view-info" class="space-y-4 hidden"></section>
 
-    <p class="text-center text-xs text-slate-400 px-4">Kết quả chỉ mang tính tham khảo. Hãy đối chiếu với chứng từ khấu trừ thuế và cơ quan thuế khi quyết toán.</p>
+    <div class="rounded-2xl bg-white/70 border border-slate-200 px-4 py-3 text-xs text-slate-500 space-y-1">
+      <p><i class="fa-solid fa-lock mr-1" aria-hidden="true"></i> <b class="text-slate-700">Dữ liệu chỉ lưu trên máy của bạn.</b> Mọi số liệu bạn nhập được lưu trong trình duyệt trên chính thiết bị này, không gửi lên máy chủ nào. Xoá dữ liệu trình duyệt hoặc gỡ app thì dữ liệu cũng mất, nên thỉnh thoảng bấm <b><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Lưu file</b> (trên điện thoại nằm trong menu <i class="fa-solid fa-bars" aria-hidden="true"></i> góc trên) để giữ một bản file <b>.yuhtax</b>.</p>
+      <p>Kết quả chỉ mang tính tham khảo. Hãy đối chiếu với chứng từ khấu trừ thuế và cơ quan thuế khi quyết toán.</p>
+    </div>
   </main>
 
   <!-- Thanh tab dưới -->
   <nav class="fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom" role="tablist">
     <div class="max-w-3xl mx-auto grid grid-cols-3 text-xs font-semibold text-slate-500">
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="month" aria-selected="true"><span class="text-xl">💰</span>Lương tháng<span class="dot w-1 h-1 rounded-full"></span></button>
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="year" aria-selected="false"><span class="text-xl">🧾</span>Quyết toán năm<span class="dot w-1 h-1 rounded-full"></span></button>
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="info" aria-selected="false"><span class="text-xl">📋</span>Biểu thuế<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="month" aria-selected="true"><span class="text-xl"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span>Lương tháng<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="year" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>Quyết toán năm<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="info" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-table-list" aria-hidden="true"></i></span>Biểu thuế<span class="dot w-1 h-1 rounded-full"></span></button>
     </div>
   </nav>
 
