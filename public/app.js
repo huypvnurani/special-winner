@@ -178,6 +178,9 @@ function syncToYear() {
 
 function renderMonth(sync = false) {
   $('mAmountLbl').textContent = m.mode === 'g2n' ? 'Lương Gross / tháng (VNĐ)' : 'Lương Net mong muốn / tháng (VNĐ)';
+  $('mModeHint').textContent = m.mode === 'g2n'
+    ? 'Gross → Net: nhập lương Gross (trước bảo hiểm & thuế, ghi trong hợp đồng) để biết số tiền thực nhận.'
+    : 'Net → Gross: nhập số tiền muốn nhận về tay để biết cần thoả thuận lương Gross bao nhiêu.';
   $('mInsSalary').classList.toggle('hidden', m.insMode !== 'custom');
   document.querySelectorAll('#view-month [data-ld]').forEach((el) => el.classList.toggle('hidden', m.contract === 'short'));
   $('mResult').innerHTML = m.amount ? renderReport(monthReport()) + exportBar('month')

@@ -24,6 +24,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      // hover: chỉ áp dụng trên máy có chuột — điện thoại không có hiệu ứng hover
+      future: { hoverOnlyWhenSupported: true },
       theme: { extend: { colors: { brand: { DEFAULT: '#0f766e', fg: '#ffffff', soft: '#ccfbf1' } } } },
     };
   </script>
@@ -38,6 +40,21 @@
     .seg button { flex:1; padding:.5rem; border-radius:.625rem; font-weight:600; color:#475569; }
     .seg button[aria-pressed="true"] { background:#fff; color:#0f766e; box-shadow:0 1px 2px rgb(0 0 0 / .1); }
     .num { font-variant-numeric: tabular-nums; }
+    /* Chú thích khi rê chuột (chỉ máy có chuột; điện thoại xem dòng giải thích bên dưới) */
+    [data-tip] { position: relative; }
+    @media (hover: hover) { .touch-only { display: none; } }
+    @media (hover: hover) {
+      [data-tip]:hover::after {
+        content: attr(data-tip); position: absolute; left: 50%; top: calc(100% + 10px); transform: translateX(-50%);
+        width: 260px; padding: .5rem .75rem; border-radius: .5rem; background: #0f172a; color: #fff;
+        font-size: .75rem; font-weight: 400; line-height: 1.45; text-align: left; white-space: normal;
+        box-shadow: 0 8px 20px rgb(0 0 0 / .2); z-index: 40; pointer-events: none;
+      }
+      [data-tip]:hover::before {
+        content: ''; position: absolute; left: 50%; top: calc(100% + 4px); transform: translateX(-50%);
+        border: 6px solid transparent; border-top: 0; border-bottom-color: #0f172a; z-index: 40;
+      }
+    }
     .tab[aria-selected="true"] { color:#0f766e; }
     .tab[aria-selected="true"] .dot { background:#0f766e; }
     table.rep td { padding:.4rem 0; vertical-align:top; }
@@ -84,9 +101,10 @@
     <section id="view-month" class="space-y-4">
       <div class="card p-4 space-y-4">
         <div class="seg flex gap-1 bg-slate-100 rounded-xl p-1" id="mMode">
-          <button data-v="g2n" aria-pressed="true">Gross → Net</button>
-          <button data-v="n2g" aria-pressed="false">Net → Gross</button>
+          <button data-v="g2n" aria-pressed="true" data-tip="Bạn biết lương Gross (tổng thu nhập trước khi trừ bảo hiểm và thuế, thường ghi trong hợp đồng) → app tính ra lương Net thực nhận về tài khoản.">Gross → Net</button>
+          <button data-v="n2g" aria-pressed="false" data-tip="Bạn biết mức lương Net muốn nhận về tay → app tính ngược ra lương Gross cần thoả thuận với công ty.">Net → Gross</button>
         </div>
+        <p id="mModeHint" class="touch-only text-xs text-slate-500 -mt-2"></p>
 
         <div>
           <label class="lbl" id="mAmountLbl" for="mAmount">Lương Gross / tháng (VNĐ)</label>
