@@ -26,11 +26,11 @@ document.addEventListener('input', (e) => { if (e.target.matches('[data-money]')
 //            tables: [{ heading, sheet, head: [...], body: [[...]], foot: [...] }] }
 // opts: { bold, muted, indent, tone: 'good'|'bad' }
 function renderReport(r) {
-  const tone = { good: 'text-emerald-600', bad: 'text-rose-600' };
+  const tone = { good: 'text-emerald-600', bad: 'text-brand-dark' };
   const hl = r.highlight ? `
     <div class="card p-5 text-center">
       <p class="text-sm text-slate-500">${esc(r.highlight.label)}</p>
-      <p class="text-3xl font-bold num mt-1 ${tone[r.highlight.tone] || 'text-brand'}">${esc(r.highlight.value)}</p>
+      <p class="text-3xl font-bold num mt-1 ${tone[r.highlight.tone] || 'text-brand-dark'}">${esc(r.highlight.value)}</p>
       ${r.highlight.sub ? `<p class="text-xs text-slate-500 mt-1">${esc(r.highlight.sub)}</p>` : ''}
     </div>` : '';
   const secs = r.sections.map((s) => `

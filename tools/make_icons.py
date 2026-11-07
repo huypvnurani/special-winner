@@ -12,7 +12,7 @@ import sys
 import zlib
 
 OUT = os.path.join(os.path.dirname(__file__), '..', 'public', 'icons')
-COLOR = sys.argv[1] if len(sys.argv) > 1 else '#0f766e'
+COLOR = sys.argv[1] if len(sys.argv) > 1 else '#C9524D'
 TEXT = (sys.argv[2] if len(sys.argv) > 2 else 'YT').upper()[:2]
 FG = (255, 255, 255, 255)
 

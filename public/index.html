@@ -9,7 +9,7 @@
 
   <!-- PWA ("Thêm vào màn hình chính"). ?v=__BUILD__ do deploy.sh thay để icon/manifest luôn mới -->
   <link rel="manifest" href="manifest.json?v=__BUILD__" />
-  <meta name="theme-color" content="#0f766e" />
+  <meta name="theme-color" content="#C9524D" />
   <link rel="icon" type="image/png" href="icons/icon-192.png?v=__BUILD__" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=__BUILD__" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -26,19 +26,24 @@
     tailwind.config = {
       // hover: chỉ áp dụng trên máy có chuột — điện thoại không có hiệu ứng hover
       future: { hoverOnlyWhenSupported: true },
-      theme: { extend: { colors: { brand: { DEFAULT: '#0f766e', fg: '#ffffff', soft: '#ccfbf1' } } } },
+      // Tông hồng san hô / đào. "slate" được thay bằng xám ấm cho hợp tông.
+      theme: { extend: { colors: {
+        brand: { DEFAULT: '#C9524D', fg: '#ffffff', soft: '#F6E4DE', light: '#E8908A', dark: '#A3302E' },
+        cream: '#FAF3F0',
+        slate: { 50: '#fbf8f7', 100: '#f5efed', 200: '#ebe1de', 300: '#ddd0cc', 400: '#ab9f9b', 500: '#7c706c', 600: '#5b504d', 700: '#453c3a', 800: '#2b2422', 900: '#1d1816' },
+      } } },
     };
   </script>
   <!-- Icon: Font Awesome 6 (ghim version, cdnjs) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="base.css?v=__BUILD__" />
   <style>
-    .card { background:#fff; border:1px solid #e2e8f0; border-radius:1rem; box-shadow:0 1px 2px rgb(0 0 0 / .05); }
-    .lbl { display:block; font-size:.8125rem; font-weight:500; color:#475569; margin-bottom:.25rem; }
-    .inp { width:100%; border:1px solid #cbd5e1; border-radius:.75rem; padding:.625rem .75rem; background:#fff; }
-    .inp:focus { outline:2px solid #0f766e33; border-color:#0f766e; }
-    .seg button { flex:1; padding:.5rem; border-radius:.625rem; font-weight:600; color:#475569; }
-    .seg button[aria-pressed="true"] { background:#fff; color:#0f766e; box-shadow:0 1px 2px rgb(0 0 0 / .1); }
+    .card { background:#fff; border:1px solid #f0e3df; border-radius:1rem; box-shadow:0 1px 2px rgb(0 0 0 / .05); }
+    .lbl { display:block; font-size:.8125rem; font-weight:500; color:#5b504d; margin-bottom:.25rem; }
+    .inp { width:100%; border:1px solid #e3d3ce; border-radius:.75rem; padding:.625rem .75rem; background:#fff; }
+    .inp:focus { outline:2px solid #C9524D33; border-color:#C9524D; }
+    .seg button { flex:1; padding:.5rem; border-radius:.625rem; font-weight:600; color:#7c706c; }
+    .seg button[aria-pressed="true"] { background:#fff; color:#A3302E; box-shadow:0 1px 2px rgb(0 0 0 / .1); }
     .num { font-variant-numeric: tabular-nums; }
     /* Chú thích khi rê chuột (chỉ máy có chuột; điện thoại xem dòng giải thích bên dưới) */
     [data-tip] { position: relative; }
@@ -55,10 +60,11 @@
         border: 6px solid transparent; border-top: 0; border-bottom-color: #0f172a; z-index: 40;
       }
     }
-    .tab[aria-selected="true"] { color:#0f766e; }
-    .tab[aria-selected="true"] .dot { background:#0f766e; }
+    .tab[aria-selected="true"] { color:#C9524D; }
+    .tab[aria-selected="true"] .dot { background:#C9524D; }
     table.rep td { padding:.4rem 0; vertical-align:top; }
-    table.rep tr + tr td { border-top:1px solid #f1f5f9; }
+    table.rep tr + tr td { border-top:1px solid #f5ebe8; }
+    .head-bg { background: linear-gradient(120deg, #D8675F 0%, #C24A45 100%); }
     .mtbl { table-layout:fixed; }
     .mtbl th:first-child { width:2rem; }
     .mtbl th:nth-child(2) { width:35%; }
@@ -68,14 +74,14 @@
 
   <script type="module" src="app.js?v=__BUILD__"></script>
 </head>
-<body class="bg-slate-100 text-slate-900 min-h-screen">
+<body class="bg-cream text-slate-900 min-h-screen">
 
-  <header class="sticky top-0 z-20 bg-brand text-brand-fg shadow safe-top">
+  <header class="sticky top-0 z-20 head-bg text-brand-fg shadow safe-top">
     <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-      <img src="icons/icon-192.png?v=__BUILD__" alt="" class="w-8 h-8 rounded-lg" />
+      <img src="icons/icon-192.png?v=__BUILD__" alt="" class="w-8 h-8 rounded-lg ring-1 ring-white/60" />
       <div class="flex-1 min-w-0 leading-tight">
         <h1 class="text-lg font-semibold">YuhTahnTax</h1>
-        <p id="subtitle" class="text-xs opacity-80 truncate">Lương & thuế TNCN hằng tháng</p>
+        <p id="subtitle" class="text-xs opacity-90 truncate">Lương & thuế TNCN hằng tháng</p>
       </div>
       <!-- Sao lưu dữ liệu ra file .yuhtax / mở lại. Máy tính: nút trên thanh; điện thoại: menu ☰ -->
       <div class="hidden sm:flex items-center gap-2 shrink-0">
@@ -152,7 +158,7 @@
         </div>
 
         <label class="flex items-start gap-3 rounded-xl bg-brand-soft/60 p-3">
-          <input id="mSync" type="checkbox" class="mt-0.5 w-5 h-5 shrink-0" style="accent-color:#0f766e" />
+          <input id="mSync" type="checkbox" class="mt-0.5 w-5 h-5 shrink-0" style="accent-color:#C9524D" />
           <span class="text-sm leading-snug"><b>Tự ghi vào quyết toán năm</b><br /><span id="mSyncInfo" class="text-xs text-slate-500"></span></span>
         </label>
 
@@ -169,7 +175,7 @@
         <p class="text-xs text-slate-400 -mt-2">Lương Gross ở trên là tổng thu nhập, đã gồm phụ cấp ăn trưa.</p>
 
         <label class="flex items-center gap-3" data-ld>
-          <input id="mUnion" type="checkbox" class="w-5 h-5 shrink-0" style="accent-color:#0f766e" />
+          <input id="mUnion" type="checkbox" class="w-5 h-5 shrink-0" style="accent-color:#C9524D" />
           <span class="text-sm">Là đoàn viên công đoàn <span class="text-slate-400">(đóng 0,5%)</span></span>
         </label>
       </div>
@@ -195,7 +201,7 @@
         </div>
 
         <details class="rounded-xl bg-brand-soft/60 p-3" id="yQuick">
-          <summary class="font-semibold text-brand cursor-pointer"><i class="fa-solid fa-bolt mr-1" aria-hidden="true"></i> Điền nhanh 12 tháng</summary>
+          <summary class="font-semibold text-brand-dark cursor-pointer"><i class="fa-solid fa-bolt mr-1" aria-hidden="true"></i> Điền nhanh 12 tháng</summary>
           <p class="text-xs text-slate-500 mt-1">Nhập lương mỗi tháng như nhau, app tự tính BH và thuế tạm khấu trừ. Sau đó sửa từng tháng bên dưới nếu khác.</p>
           <div class="grid grid-cols-2 gap-3 mt-3">
             <div class="col-span-2"><label class="lbl" for="qGross">Lương Gross / tháng</label><input id="qGross" class="inp num" inputmode="numeric" data-money /></div>
@@ -222,7 +228,7 @@
         <div>
           <p class="lbl">Nguồn thu nhập khác <span class="font-normal text-slate-400">(công ty thứ 2, hợp đồng vãng lai, cộng tác viên…)</span></p>
           <div id="ySources" class="space-y-3"></div>
-          <button id="yAddSource" class="mt-2 w-full rounded-xl border border-dashed border-brand text-brand font-semibold py-2.5 active:bg-brand-soft"><i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> Thêm nguồn thu nhập</button>
+          <button id="yAddSource" class="mt-2 w-full rounded-xl border border-dashed border-brand text-brand-dark font-semibold py-2.5 active:bg-brand-soft"><i class="fa-solid fa-plus mr-1" aria-hidden="true"></i> Thêm nguồn thu nhập</button>
         </div>
 
         <div class="grid grid-cols-2 gap-3">

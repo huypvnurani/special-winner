@@ -9,7 +9,8 @@ const LIBS = {
   xlsx: 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
 };
 const FONTS = { normal: 'fonts/BeVietnamPro-400Regular.ttf', bold: 'fonts/BeVietnamPro-700Bold.ttf' };
-const BRAND = [15, 118, 110];
+const BRAND = [201, 82, 77];   // #C9524D
+const SOFT = [251, 236, 232];
 
 const loaded = {};
 function loadScript(url) {
@@ -78,7 +79,7 @@ export async function exportPDF(report, filename) {
   // Ô kết quả chính
   if (report.highlight) {
     y += 16;
-    doc.setFillColor(240, 253, 250).setDrawColor(...BRAND).roundedRect(X, y, W - 2 * X, report.highlight.sub ? 62 : 48, 6, 6, 'FD');
+    doc.setFillColor(...SOFT).setDrawColor(...BRAND).roundedRect(X, y, W - 2 * X, report.highlight.sub ? 62 : 48, 6, 6, 'FD');
     doc.setFontSize(10).setTextColor(70).text(report.highlight.label, W / 2, y + 17, { align: 'center' });
     doc.setFont('BVP', 'bold').setFontSize(18).setTextColor(...BRAND).text(report.highlight.value, W / 2, y + 38, { align: 'center' });
     doc.setFont('BVP', 'normal');
@@ -115,7 +116,7 @@ export async function exportPDF(report, filename) {
       headStyles: { fillColor: BRAND, textColor: 255, fontStyle: 'bold', halign: 'right' },
       body: t.body.map((r) => r.map((c, i) => ({ content: typeof c === 'number' ? Math.round(c).toLocaleString('vi-VN') : c, styles: { halign: i ? 'right' : 'left' } }))),
       foot: t.foot ? [t.foot.map((c, i) => ({ content: typeof c === 'number' ? Math.round(c).toLocaleString('vi-VN') : c, styles: { halign: i ? 'right' : 'left' } }))] : undefined,
-      footStyles: { fillColor: [240, 253, 250], textColor: 30, fontStyle: 'bold' },
+      footStyles: { fillColor: SOFT, textColor: 30, fontStyle: 'bold' },
       didParseCell: (d) => { if (d.section === 'head' && (d.row.index === 0 || d.column.index === 0)) d.cell.styles.halign = 'left'; },
     });
     y = doc.lastAutoTable.finalY;
