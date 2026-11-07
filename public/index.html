@@ -60,8 +60,9 @@
         border: 6px solid transparent; border-top: 0; border-bottom-color: #0f172a; z-index: 40;
       }
     }
-    .tab[aria-selected="true"] { color:#C9524D; }
-    .tab[aria-selected="true"] .dot { background:#C9524D; }
+    /* Tab đang chọn: viền trên dày + nền hồng nhạt */
+    .tab { border-top: 3px solid transparent; }
+    .tab[aria-selected="true"] { color:#C9524D; border-top-color:#C9524D; background:#F6E4DE80; }
     table.rep td { padding:.4rem 0; vertical-align:top; }
     table.rep tr + tr td { border-top:1px solid #f5ebe8; }
     .head-bg { background: linear-gradient(120deg, #D8675F 0%, #C24A45 100%); }
@@ -258,9 +259,9 @@
   <!-- Thanh tab dưới -->
   <nav class="fixed bottom-0 inset-x-0 z-20 bg-white/95 backdrop-blur border-t border-slate-200 safe-bottom" role="tablist">
     <div class="max-w-3xl mx-auto grid grid-cols-3 text-xs font-semibold text-slate-500">
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="month" aria-selected="true"><span class="text-xl"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span>Lương tháng<span class="dot w-1 h-1 rounded-full"></span></button>
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="year" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>Quyết toán năm<span class="dot w-1 h-1 rounded-full"></span></button>
-      <button class="tab py-2 flex flex-col items-center gap-1" data-tab="info" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-table-list" aria-hidden="true"></i></span>Biểu thuế<span class="dot w-1 h-1 rounded-full"></span></button>
+      <button class="tab pt-2 pb-2.5 flex flex-col items-center gap-1" data-tab="month" aria-selected="true"><span class="text-xl"><i class="fa-solid fa-wallet" aria-hidden="true"></i></span>Lương tháng</button>
+      <button class="tab pt-2 pb-2.5 flex flex-col items-center gap-1" data-tab="year" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>Quyết toán năm</button>
+      <button class="tab pt-2 pb-2.5 flex flex-col items-center gap-1" data-tab="info" aria-selected="false"><span class="text-xl"><i class="fa-solid fa-table-list" aria-hidden="true"></i></span>Biểu thuế</button>
     </div>
   </nav>
 

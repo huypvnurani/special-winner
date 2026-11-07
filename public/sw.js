@@ -25,7 +25,8 @@ self.addEventListener('fetch', (e) => {
 
   // File của app: ưu tiên mạng để luôn lấy bản mới, offline thì dùng cache
   if (url.origin === location.origin) {
-    e.respondWith(fetch(req).then((res) => {
+    // cache: 'no-cache' → luôn hỏi lại server (không dùng bản HTTP cache cũ của trình duyệt)
+    e.respondWith(fetch(req, { cache: 'no-cache' }).then((res) => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
       return res;
     }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match('index.html'))));
