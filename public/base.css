@@ -18,7 +18,8 @@ input, textarea, select { font-size: 16px !important; }
 
 /* Tai thỏ / thanh home (cần viewport-fit=cover) */
 .safe-top { padding-top: max(env(safe-area-inset-top), 0.5rem); }
-.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0.75rem); }
+/* Giảm đệm dưới: chừa vừa đủ thanh home của iPhone (~20px), máy khác 4px */
+.safe-bottom { padding-bottom: max(calc(env(safe-area-inset-bottom) - 14px), 0.25rem); }
 
 /* Vùng tự xử lý cử chỉ (canvas, kéo thả, bản đồ…) thì thêm class này */
 .touch-none-all { touch-action: none; }
